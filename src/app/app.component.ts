@@ -4,6 +4,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Chapter } from './models/chapter';
 import { AnimationOptions } from 'ngx-lottie';
+import { MatDialog } from '@angular/material/dialog';
+import { TwoOptionAlertComponent } from './components/loader/two-option-alert/two-option-alert.component';
+import { NoopScrollStrategy } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-root',
@@ -37,8 +40,37 @@ export class AppComponent {
   constructor(
     private aiService: AIService,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog
   ) {}
+
+  ngOnInit(): void {
+    let hasLaunched =
+      window.localStorage.getItem('launched') === 'true' || false;
+
+    if (!hasLaunched) {
+      const dialogRef = this.dialog.open(TwoOptionAlertComponent, {
+        data: {
+          title: 'Welcome',
+          body: `
+          The Infinite Story is a project built by <a target="_blank" href="https://www.linkedin.com/in/addadahine">Sam Addadahine</a> as part of <a target="_blank" href="https://googleai.devpost.com/">Google\'s AI Hackathon 2024</a>
+          <br><br>
+          Made possible thanks to the incredible Text Prompt and TTS APIs by <a target="_blank" href="https://cloud.google.com/vertex-ai">Google Vertex AI</a> & <a target="_blank" href="https://openai.com/">OpenAI</a>, respectively.
+          `,
+          buttonOne: 'Close',
+        },
+        scrollStrategy: new NoopScrollStrategy(),
+        autoFocus: false,
+        width: '350px',
+        disableClose: true,
+        panelClass: 'custom-dialog',
+      });
+
+      dialogRef.afterClosed().subscribe((option: number) => {
+        window.localStorage.setItem('launched', 'true');
+      });
+    }
+  }
 
   generate(option: string = ''): void {
     if (this.audioContext) {

@@ -11,15 +11,18 @@ import { ApiService } from './services/api.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { LottieModule } from 'ngx-lottie';
+import { TwoOptionAlertComponent } from './components/loader/two-option-alert/two-option-alert.component';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 export function playerFactory() {
   return import(/* webpackChunkName: 'lottie-web' */ 'lottie-web');
 }
 
 @NgModule({
-  declarations: [AppComponent, LoaderComponent],
+  declarations: [AppComponent, LoaderComponent, TwoOptionAlertComponent],
   imports: [
     BrowserModule,
+    MatDialogModule,
     CommonModule,
     HttpClientModule,
     AppRoutingModule,
@@ -28,7 +31,13 @@ export function playerFactory() {
     MatProgressSpinnerModule,
     LottieModule.forRoot({ player: playerFactory }),
   ],
-  providers: [ApiService],
+  providers: [
+    ApiService,
+    {
+      provide: MatDialogRef,
+      useValue: {},
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

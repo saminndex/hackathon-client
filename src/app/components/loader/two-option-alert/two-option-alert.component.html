@@ -1,0 +1,26 @@
+<div
+  class="d-flex justify-content-between align-items-md-center align-items-baseline"
+>
+  <p
+    class="section-title"
+    style="margin-bottom: 0px; font-weight: bold; font-size: 16px"
+  >
+    {{ data.title }}
+  </p>
+</div>
+
+<div mat-dialog-content class="mat-typography" style="margin-top: 20px">
+  <p class="dialog-body" [innerHTML]="data.body"></p>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button
+    [disabled]="false"
+    (click)="buttonOne()"
+    mat-flat-button
+    class="secondary-button"
+    style="margin-right: 10px"
+  >
+    <span>{{ data.buttonOne }}</span>
+  </button>
+</div>
