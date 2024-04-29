@@ -15,7 +15,6 @@ import { NoopScrollStrategy } from '@angular/cdk/overlay';
 })
 export class AppComponent {
   title?: string;
-  genre?: string;
 
   currentChapter = 0;
   previousChapters: any[] = [];
@@ -42,7 +41,15 @@ export class AppComponent {
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
-  ) {}
+  ) {
+    this.audioContext = new AudioContext();
+  }
+
+  ngOnDestroy(): void {
+    if (this.audioContext) {
+      this.audioContext.close();
+    }
+  }
 
   ngOnInit(): void {
     let hasLaunched =
@@ -86,8 +93,6 @@ export class AppComponent {
             this.chapter = res.data;
             this.title = this.chapter?.title || this.title;
             this.image = this.chapter?.image || this.image;
-            this.genre = this.chapter?.genre || this.genre;
-
             this.chapter!.audio = new Uint8Array(res.data.audio.data).buffer;
 
             this.refresh();
@@ -116,8 +121,7 @@ export class AppComponent {
         error: (res: HttpErrorResponse) => {
           this.showError(res.error.message);
         },
-      })
-      .add(() => (this.loading = false));
+      });
   }
 
   generateNextOptionB() {
@@ -136,13 +140,10 @@ export class AppComponent {
         error: (res: HttpErrorResponse) => {
           this.showError(res.error.message);
         },
-      })
-      .add(() => (this.loading = false));
+      });
   }
 
   selectOption(option: number) {
-    this.playAudio();
-
     if (option === 0) {
       this.chapter = this.nextOptionAChapter;
     } else {
@@ -178,59 +179,81 @@ export class AppComponent {
 
   async setupAudio() {
     if (!this.chapter?.audio) {
+      console.error('No audio data available');
       return;
     }
     this.audioContext = new AudioContext();
-    await this.createAudioSource();
+    await this.loadAudioBuffer(this.chapter.audio);
   }
 
-  async createAudioSource() {
-    if (this.audioContext && this.chapter?.audio) {
-      const buffer = await this.audioContext.decodeAudioData(
-        this.chapter?.audio.slice(0)
+  async loadAudioBuffer(audioData: any) {
+    try {
+      const buffer = await this.audioContext!.decodeAudioData(
+        audioData.slice(0)
       );
-      this.audioSource = this.audioContext.createBufferSource();
-      this.audioSource.buffer = buffer;
-      this.gainNode = this.audioContext.createGain();
-      this.audioSource.connect(this.gainNode);
-      this.gainNode.connect(this.audioContext.destination);
-
-      this.audioSource.onended = () => {
-        this.isPlaying = false;
-        this.cdr.detectChanges();
-      };
+      this.prepareAudioSource(buffer);
+    } catch (error) {
+      console.error('Error decoding audio data:', error);
     }
+  }
+
+  prepareAudioSource(buffer: any) {
+    this.audioSource = this.audioContext!.createBufferSource();
+    this.audioSource.buffer = buffer;
+    this.gainNode = this.audioContext!.createGain();
+    this.audioSource.connect(this.gainNode);
+    this.gainNode.connect(this.audioContext!.destination);
+    this.audioSource.onended = () => {
+      this.isPlaying = false;
+      this.cdr.detectChanges();
+    };
   }
 
   togglePlayPause() {
     if (this.audioContext) {
-      if (this.audioContext.state === 'suspended') {
+      if (
+        this.audioContext.state === 'suspended' ||
+        this.audioContext.state === 'closed'
+      ) {
         this.audioContext
           .resume()
           .then(() => {
             console.log('AudioContext resumed successfully');
-            this.isPlaying = true;
-            this.playCurrentSource(); // Ensure this is a method that plays the current source
+
+            if (!this.isPlaying) {
+              this.playCurrentSource();
+            }
           })
           .catch((error) => {
             console.error('Error resuming AudioContext:', error);
           });
       } else if (!this.isPlaying) {
-        this.createAudioSource().then(() => {
-          this.audioSource?.start(0);
-          this.isPlaying = true;
-        });
+        this.playCurrentSource();
       } else {
         this.audioContext.suspend();
         this.isPlaying = false;
       }
     }
+    this.cdr.detectChanges();
   }
 
   playCurrentSource() {
-    if (this.audioSource) {
-      this.audioSource.start(0);
+    if (this.audioSource && this.isPlaying) {
+      console.warn('Audio is already playing');
+      return;
     }
+    this.audioSource = this.audioContext!.createBufferSource();
+    if (!this.audioSource.buffer) {
+      console.error('Audio buffer not available');
+      return;
+    }
+    this.audioSource.buffer = this.audioSource.buffer;
+    this.audioSource.connect(this.audioContext!.destination);
+    this.audioSource.onended = () => {
+      this.isPlaying = false;
+    };
+    this.audioSource.start(0);
+    this.isPlaying = true;
   }
 
   playAudio() {

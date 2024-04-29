@@ -1,6 +1,6 @@
 <div class="outer-container">
   <div style="display: flex; justify-content: space-between">
-    <p style="color: rgb(255, 255, 255); margin: 0px">♾️ The Infinite Story</p>
+    <p style="color: rgb(255, 255, 255); margin: 0px">The Infinite Story</p>
     <p style="color: rgb(188, 188, 188); margin: 0px">
       Refresh browser for a new story
     </p>
@@ -28,7 +28,6 @@
   <div class="centered-container" *ngIf="chapter">
     <p id="chapter">Chapter {{ currentChapter }}</p>
     <p id="title">{{ title }}</p>
-    <!-- <div id="genre" *ngIf="genre">{{ genre }}</div> -->
 
     <div class="image-overlay-container">
       <img class="story-image" *ngIf="image" [src]="image" />
