@@ -31,7 +31,11 @@
 
     <div class="image-overlay-container">
       <img class="story-image" *ngIf="image" [src]="image" />
-      <ng-lottie class="lottie-animation" [options]="options"></ng-lottie>
+      <ng-lottie
+        class="lottie-animation"
+        [options]="options"
+        *ngIf="isPlaying"
+      ></ng-lottie>
     </div>
 
     <p id="content" *ngIf="chapter?.content">{{ chapter.content }}</p>
