@@ -26,9 +26,8 @@ export class AppComponent {
 
   image?: string;
 
-  private audioContext?: AudioContext;
-  private audioSource?: AudioBufferSourceNode;
-  private gainNode?: GainNode;
+  private audioContext: AudioContext = new AudioContext();
+  private audioBuffer?: AudioBuffer;
 
   loading = false;
 
@@ -41,49 +40,40 @@ export class AppComponent {
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
-  ) {
-    this.audioContext = new AudioContext();
-  }
-
-  ngOnDestroy(): void {
-    if (this.audioContext) {
-      this.audioContext.close();
-    }
-  }
+  ) {}
 
   ngOnInit(): void {
-    let hasLaunched =
-      window.localStorage.getItem('launched') === 'true' || false;
+    this.checkLaunchDialog();
+  }
 
+  checkLaunchDialog() {
+    const hasLaunched = window.localStorage.getItem('launched') === 'true';
     if (!hasLaunched) {
-      const dialogRef = this.dialog.open(TwoOptionAlertComponent, {
-        data: {
-          title: 'Welcome',
-          body: `
-          The Infinite Story is a project built by <a target="_blank" href="https://www.linkedin.com/in/addadahine">Sam Addadahine</a> as part of <a target="_blank" href="https://googleai.devpost.com/">Google\'s AI Hackathon 2024</a>
-          <br><br>
-          Made possible thanks to the incredible Text Prompt and TTS APIs by <a target="_blank" href="https://cloud.google.com/vertex-ai">Google Vertex AI</a> & <a target="_blank" href="https://openai.com/">OpenAI</a>, respectively.
-          `,
-          buttonOne: 'Close',
-        },
-        scrollStrategy: new NoopScrollStrategy(),
-        autoFocus: false,
-        width: '350px',
-        disableClose: true,
-        panelClass: 'custom-dialog',
-      });
-
-      dialogRef.afterClosed().subscribe((option: number) => {
-        window.localStorage.setItem('launched', 'true');
-      });
+      this.dialog
+        .open(TwoOptionAlertComponent, {
+          data: {
+            title: 'Welcome',
+            body: `
+            The Infinite Story is a project built by <a target="_blank" href="https://www.linkedin.com/in/addadahine">Sam Addadahine</a> as part of <a target="_blank" href="https://googleai.devpost.com/">Google\'s AI Hackathon 2024</a>
+            <br><br>
+            Made possible thanks to the incredible Text Prompt and TTS APIs by <a target="_blank" href="https://cloud.google.com/vertex-ai">Google Vertex AI</a> & <a target="_blank" href="https://openai.com/">OpenAI</a>, respectively.
+            `,
+            buttonOne: 'Close',
+          },
+          scrollStrategy: new NoopScrollStrategy(),
+          autoFocus: false,
+          width: '350px',
+          disableClose: true,
+          panelClass: 'custom-dialog',
+        })
+        .afterClosed()
+        .subscribe(() => {
+          window.localStorage.setItem('launched', 'true');
+        });
     }
   }
 
   generate(option: string = ''): void {
-    if (this.audioContext) {
-      this.audioContext.close();
-    }
-
     this.loading = true;
     this.aiService
       .generateChapter(this.previousChapters, option)
@@ -182,77 +172,45 @@ export class AppComponent {
       console.error('No audio data available');
       return;
     }
-    this.audioContext = new AudioContext();
+
     await this.loadAudioBuffer(this.chapter.audio);
   }
 
   async loadAudioBuffer(audioData: any) {
     try {
-      const buffer = await this.audioContext!.decodeAudioData(
-        audioData.slice(0)
-      );
-      this.prepareAudioSource(buffer);
+      this.audioBuffer = await this.audioContext!.decodeAudioData(audioData);
     } catch (error) {
       console.error('Error decoding audio data:', error);
     }
   }
 
-  prepareAudioSource(buffer: any) {
-    this.audioSource = this.audioContext!.createBufferSource();
-    this.audioSource.buffer = buffer;
-    this.gainNode = this.audioContext!.createGain();
-    this.audioSource.connect(this.gainNode);
-    this.gainNode.connect(this.audioContext!.destination);
-    this.audioSource.onended = () => {
-      this.isPlaying = false;
-      this.cdr.detectChanges();
-    };
-  }
-
   togglePlayPause() {
-    if (this.audioContext) {
-      if (
-        this.audioContext.state === 'suspended' ||
-        this.audioContext.state === 'closed'
-      ) {
-        this.audioContext
-          .resume()
-          .then(() => {
-            console.log('AudioContext resumed successfully');
-
-            if (!this.isPlaying) {
-              this.playCurrentSource();
-            }
-          })
-          .catch((error) => {
-            console.error('Error resuming AudioContext:', error);
-          });
-      } else if (!this.isPlaying) {
-        this.playCurrentSource();
-      } else {
-        this.audioContext.suspend();
+    if (this.isPlaying) {
+      this.audioContext.suspend().then(() => {
         this.isPlaying = false;
+        this.cdr.detectChanges();
+      });
+    } else {
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
       }
+      this.playCurrentSource();
     }
-    this.cdr.detectChanges();
   }
 
   playCurrentSource() {
-    if (this.audioSource && this.isPlaying) {
-      console.warn('Audio is already playing');
-      return;
-    }
-    this.audioSource = this.audioContext!.createBufferSource();
-    if (!this.audioSource.buffer) {
+    if (!this.audioBuffer) {
       console.error('Audio buffer not available');
       return;
     }
-    this.audioSource.buffer = this.audioSource.buffer;
-    this.audioSource.connect(this.audioContext!.destination);
-    this.audioSource.onended = () => {
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.audioBuffer;
+    source.connect(this.audioContext.destination);
+    source.onended = () => {
       this.isPlaying = false;
+      this.cdr.detectChanges();
     };
-    this.audioSource.start(0);
+    source.start();
     this.isPlaying = true;
   }
 
