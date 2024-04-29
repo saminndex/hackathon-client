@@ -1,5 +1,5 @@
 <div class="outer-container">
-  <div style="display: flex; justify-content: space-around">
+  <div style="display: flex; justify-content: space-between">
     <p style="color: rgb(255, 255, 255); margin: 0px">♾️ The Infinite Story</p>
     <p style="color: rgb(188, 188, 188); margin: 0px">
       Refresh browser for a new story
@@ -11,6 +11,7 @@
       (click)="generate()"
       [disabled]="loading"
       *ngIf="!chapter && !loading"
+      id="pulse-button"
     >
       <span style="display: flex; align-items: center"
         ><img
@@ -27,7 +28,7 @@
   <div class="centered-container" *ngIf="chapter">
     <p id="chapter">Chapter {{ currentChapter }}</p>
     <p id="title">{{ title }}</p>
-    <div id="genre" *ngIf="genre">{{ genre }}</div>
+    <!-- <div id="genre" *ngIf="genre">{{ genre }}</div> -->
 
     <div class="image-overlay-container">
       <img class="story-image" *ngIf="image" [src]="image" />
@@ -36,6 +37,14 @@
         [options]="options"
         *ngIf="isPlaying"
       ></ng-lottie>
+      <button
+        class="play-button"
+        id="pulse-button"
+        *ngIf="!isPlaying"
+        (click)="togglePlayPause()"
+      >
+        {{ "Play" }}
+      </button>
     </div>
 
     <p id="content" *ngIf="chapter?.content">{{ chapter.content }}</p>

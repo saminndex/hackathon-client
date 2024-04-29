@@ -155,7 +155,7 @@ export class AppComponent {
     this.refresh();
   }
 
-  refresh(): void {
+  async refresh() {
     this.currentChapter++;
 
     this.cdr.detectChanges();
@@ -199,17 +199,22 @@ export class AppComponent {
         this.isPlaying = false;
         this.cdr.detectChanges();
       };
-
-      this.isPlaying = true;
-      this.audioSource.start();
     }
   }
 
   togglePlayPause() {
     if (this.audioContext) {
       if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
-        this.isPlaying = true;
+        this.audioContext
+          .resume()
+          .then(() => {
+            console.log('AudioContext resumed successfully');
+            this.isPlaying = true;
+            this.playCurrentSource(); // Ensure this is a method that plays the current source
+          })
+          .catch((error) => {
+            console.error('Error resuming AudioContext:', error);
+          });
       } else if (!this.isPlaying) {
         this.createAudioSource().then(() => {
           this.audioSource?.start(0);
@@ -219,6 +224,12 @@ export class AppComponent {
         this.audioContext.suspend();
         this.isPlaying = false;
       }
+    }
+  }
+
+  playCurrentSource() {
+    if (this.audioSource) {
+      this.audioSource.start(0);
     }
   }
 
