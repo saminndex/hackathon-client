@@ -155,7 +155,7 @@ export class AppComponent {
     this.refresh();
   }
 
-  async refresh() {
+  refresh() {
     this.currentChapter++;
 
     this.cdr.detectChanges();
