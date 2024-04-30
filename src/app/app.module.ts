@@ -12,8 +12,8 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 import { AppComponent } from './app.component';
 import { LoaderComponent } from './components/loader/loader.component';
-import { TwoOptionAlertComponent } from './components/loader/two-option-alert/two-option-alert.component';
-import { LanguageSelectorComponent } from './components/loader/language-selector/language-selector.component';
+import { TwoOptionAlertComponent } from './components/two-option-alert/two-option-alert.component';
+import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 
 import { ApiService } from './services/api.service';
 import { LottieModule } from 'ngx-lottie';

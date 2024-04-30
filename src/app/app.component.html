@@ -4,7 +4,15 @@
   </div>
 
   <div style="display: flex; justify-content: space-between">
-    <p style="color: rgb(255, 255, 255); margin: 0px; font-weight: bold">
+    <p
+      style="
+        color: rgb(255, 255, 255);
+        margin: 0px;
+        font-weight: bold;
+        cursor: pointer;
+      "
+      (click)="reload()"
+    >
       The Infinite Story
     </p>
     <p style="margin: 0px">
@@ -54,7 +62,7 @@
         *ngIf="!isPlaying && !hasPlayedAudio"
         (click)="togglePlayPause()"
       >
-        {{ l18n("play") }}
+        <img src="../assets/play.png" width="20" height="20" />
       </button>
     </div>
 

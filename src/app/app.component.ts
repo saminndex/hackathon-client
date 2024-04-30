@@ -5,11 +5,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Chapter } from './models/chapter';
 import { AnimationOptions } from 'ngx-lottie';
 import { MatDialog } from '@angular/material/dialog';
-import { TwoOptionAlertComponent } from './components/loader/two-option-alert/two-option-alert.component';
+import { TwoOptionAlertComponent } from './components/two-option-alert/two-option-alert.component';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { Language } from './models/language';
 import { Constants } from './app.constants';
-import { LanguageSelectorComponent } from './components/loader/language-selector/language-selector.component';
+import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
 
 @Component({
   selector: 'app-root',
@@ -305,5 +305,9 @@ export class AppComponent {
 
   l18n(key: string): string {
     return this.constants.strings[key]?.[this.selectedLanguage.name];
+  }
+
+  reload(): void {
+    window.location.reload();
   }
 }
