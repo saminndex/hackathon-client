@@ -18,7 +18,7 @@ export class LoaderComponent {
   currentLabelIndex = 0;
   label$: Observable<string>;
 
-  selectedLanguage: Language = this.constants.languages[0];
+  selectedLanguage: Language = this.constants.languages[1];
 
   constructor(private constants: Constants) {
     this.label$ = interval(3000).pipe(

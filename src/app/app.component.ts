@@ -49,7 +49,7 @@ export class AppComponent {
   // };
 
   isPlaying = false;
-  selectedLanguage: Language = this.constants.languages[0];
+  selectedLanguage: Language = this.constants.languages[1];
   hasPlayedAudio = false;
 
   constructor(
