@@ -190,6 +190,8 @@ export class AppComponent {
     this.nextOptionAChapter = undefined;
     this.nextOptionBChapter = undefined;
 
+    this.playAudio();
+
     this.refresh(true);
   }
 
