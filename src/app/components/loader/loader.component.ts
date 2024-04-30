@@ -11,7 +11,6 @@ import { Language } from 'src/app/models/language';
   styleUrls: ['./loader.component.css'],
 })
 export class LoaderComponent {
-  @Input() loading = false;
   @Input() language?: Language;
   options: AnimationOptions = { path: '/assets/story-loader.json', loop: true };
 

@@ -97,7 +97,7 @@ export class AppComponent {
     }
   }
 
-  generate(option: string = ''): void {
+  generate(option: string = '') {
     this.loading = true;
     this.aiService
       .generateChapter(
@@ -106,14 +106,14 @@ export class AppComponent {
         this.selectedLanguage.name
       )
       .subscribe({
-        next: (res: any) => {
+        next: async (res: any) => {
           if (res) {
             this.chapter = res.data;
             this.title = this.chapter?.title || this.title;
             this.image = this.chapter?.image || this.image;
             this.chapter!.audio = new Uint8Array(res.data.audio.data).buffer;
 
-            this.refresh();
+            await this.refresh();
           }
         },
         error: (res: HttpErrorResponse) => {
@@ -183,10 +183,10 @@ export class AppComponent {
     this.nextOptionAChapter = undefined;
     this.nextOptionBChapter = undefined;
 
-    this.refresh();
+    this.refresh(true);
   }
 
-  refresh() {
+  async refresh(autoPlay: boolean = false) {
     this.currentChapter++;
 
     this.cdr.detectChanges();
@@ -195,7 +195,12 @@ export class AppComponent {
       [`chapter${this.currentChapter}`]: this.chapter!.content,
     });
 
-    this.setupAudio();
+    const setupComplete = await this.setupAudio();
+
+    if (setupComplete && autoPlay) {
+      this.hasPlayedAudio = false;
+      this.togglePlayPause();
+    }
 
     this.generateNextOptionA();
     this.generateNextOptionB();
@@ -207,14 +212,16 @@ export class AppComponent {
     });
   }
 
-  async setupAudio() {
+  async setupAudio(): Promise<boolean> {
     if (!this.chapter?.audio) {
       console.error('No audio data available');
-      return;
+      return false;
     }
 
     this.audioContext = new AudioContext();
     await this.loadAudioBuffer(this.chapter.audio);
+
+    return true;
   }
 
   async loadAudioBuffer(audioData: any) {
@@ -282,14 +289,17 @@ export class AppComponent {
         },
         scrollStrategy: new NoopScrollStrategy(),
         autoFocus: false,
-        width: '350px',
+        width: '450px',
+        height: '400px',
         disableClose: true,
         panelClass: 'custom-dialog',
       })
       .afterClosed()
-      .subscribe((language: Language) => {
-        this.selectedLanguage = language;
-        window.localStorage.setItem('language', language.name);
+      .subscribe((language?: Language) => {
+        if (language) {
+          this.selectedLanguage = language;
+          window.localStorage.setItem('language', language.name);
+        }
       });
   }
 

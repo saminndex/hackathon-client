@@ -4,7 +4,17 @@
   </div>
 
   <div style="display: flex; justify-content: space-between">
-    <p style="color: rgb(255, 255, 255); margin: 0px">The Infinite Story</p>
+    <p style="color: rgb(255, 255, 255); margin: 0px; font-weight: bold">
+      The Infinite Story
+    </p>
+    <p style="margin: 0px">
+      <a
+        target="_blank"
+        href="https://googleai.devpost.com/"
+        style="color: rgb(133, 113, 180)"
+        >Google AI Hackathon 2024</a
+      >
+    </p>
   </div>
 
   <div class="pending-container" *ngIf="!chapter">
@@ -23,7 +33,7 @@
       >{{ l18n("generateStory") }}
     </button>
 
-    <loader [loading]="loading" [language]="selectedLanguage"></loader>
+    <loader *ngIf="loading" [language]="selectedLanguage"></loader>
   </div>
 
   <div class="centered-container" *ngIf="chapter">
@@ -31,16 +41,17 @@
     <p id="title">{{ title }}</p>
 
     <div class="image-overlay-container">
-      <img class="story-image" *ngIf="image" [src]="image" />
       <ng-lottie
         class="lottie-animation"
         [options]="options"
         *ngIf="isPlaying"
       ></ng-lottie>
+      <img class="story-image" *ngIf="image" [src]="image" />
+
       <button
         class="play-button"
         id="pulse-button"
-        *ngIf="!isPlaying"
+        *ngIf="!isPlaying && !hasPlayedAudio"
         (click)="togglePlayPause()"
       >
         {{ l18n("play") }}
