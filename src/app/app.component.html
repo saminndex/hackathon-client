@@ -1,9 +1,10 @@
 <div class="outer-container">
+  <div class="language-fab" (click)="openLanguageSelector()" *ngIf="!loading">
+    {{ selectedLanguage.emoji }}
+  </div>
+
   <div style="display: flex; justify-content: space-between">
     <p style="color: rgb(255, 255, 255); margin: 0px">The Infinite Story</p>
-    <p style="color: rgb(188, 188, 188); margin: 0px">
-      Refresh browser for a new story
-    </p>
   </div>
 
   <div class="pending-container" *ngIf="!chapter">
@@ -19,14 +20,14 @@
           width="25"
           height="25"
           style="margin-right: 10px" /></span
-      >{{ "Generate Story" }}
+      >{{ l18n("generateStory") }}
     </button>
 
-    <loader [loading]="loading"></loader>
+    <loader [loading]="loading" [language]="selectedLanguage"></loader>
   </div>
 
   <div class="centered-container" *ngIf="chapter">
-    <p id="chapter">Chapter {{ currentChapter }}</p>
+    <p id="chapter">{{ l18n("chapter") }} {{ currentChapter }}</p>
     <p id="title">{{ title }}</p>
 
     <div class="image-overlay-container">
@@ -42,7 +43,7 @@
         *ngIf="!isPlaying"
         (click)="togglePlayPause()"
       >
-        {{ "Play" }}
+        {{ l18n("play") }}
       </button>
     </div>
 
@@ -56,39 +57,27 @@
         margin-bottom: 40px;
       "
     >
-      <div style="width: 50%">
-        <p id="chapter">Option A</p>
-        <p id="content" style="margin-top: 0px">{{ chapter.optionA }}</p>
+      <div class="option-container">
+        <p
+          id="chapter"
+          [class.selectableA]="canSelectOption"
+          (click)="selectOption(0)"
+        >
+          {{ l18n("optionA") }}
+        </p>
+        <p id="content" style="margin-top: 10px">{{ chapter.optionA }}</p>
       </div>
 
-      <div style="width: 50%">
-        <p id="chapter">Option B</p>
-        <p id="content" style="margin-top: 0px">{{ chapter.optionB }}</p>
+      <div class="option-container">
+        <p
+          id="chapter"
+          [class.selectableB]="canSelectOption"
+          (click)="selectOption(1)"
+        >
+          {{ l18n("optionB") }}
+        </p>
+        <p id="content" style="margin-top: 10px">{{ chapter.optionB }}</p>
       </div>
-    </div>
-
-    <div
-      style="
-        display: flex;
-        height: 55px;
-        width: 100%;
-        justify-content: space-evenly;
-      "
-    >
-      <button
-        (click)="selectOption(0)"
-        [disabled]="loading"
-        *ngIf="nextOptionAChapter && nextOptionBChapter && !isPlaying"
-      >
-        Option A
-      </button>
-      <button
-        (click)="selectOption(1)"
-        [disabled]="loading"
-        *ngIf="nextOptionAChapter && nextOptionBChapter && !isPlaying"
-      >
-        Option B
-      </button>
     </div>
   </div>
 </div>

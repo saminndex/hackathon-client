@@ -7,6 +7,9 @@ import { AnimationOptions } from 'ngx-lottie';
 import { MatDialog } from '@angular/material/dialog';
 import { TwoOptionAlertComponent } from './components/loader/two-option-alert/two-option-alert.component';
 import { NoopScrollStrategy } from '@angular/cdk/overlay';
+import { Language } from './models/language';
+import { Constants } from './app.constants';
+import { LanguageSelectorComponent } from './components/loader/language-selector/language-selector.component';
 
 @Component({
   selector: 'app-root',
@@ -26,23 +29,44 @@ export class AppComponent {
 
   image?: string;
 
-  private audioContext: AudioContext = new AudioContext();
+  // image?: string =
+  //   'https://plus.unsplash.com/premium_photo-1711508491462-5567bb2f1e33?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+
+  private audioContext!: AudioContext;
   private audioBuffer?: AudioBuffer;
 
   loading = false;
 
   chapter?: Chapter;
+  // chapter?: Chapter = {
+  //   title: 'Title',
+  //   content:
+  //     'The wind whipped your hair as you stood at the precipice of the ancient stone bridge. Below, a raging torrent churned, threatening to pull you into its depths with each crashing wave. Your heart hammered against your ribs, keeping time with the rhythm of the treacherous current. Before you, a weathered signpost stood sentinel, its weathered wood splintering at the edges. Two arrows pointed in opposite directions, each carved with an inscription worn smooth by time and countless hands.',
+  //   optionA:
+  //     'Follow the arrow that points towards the towering mountain shrouded in mist, its peak hidden from view.',
+  //   optionB:
+  //     'Turn and follow the arrow that leads into the whispering woods, shadows dancing among the ancient trees.',
+  // };
 
   isPlaying = false;
+  selectedLanguage: Language = this.constants.languages[0];
+  hasPlayedAudio = false;
 
   constructor(
     private aiService: AIService,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public constants: Constants
   ) {}
 
   ngOnInit(): void {
+    const storedLanguage = window.localStorage.getItem('language');
+
+    this.selectedLanguage =
+      this.constants.languages.find((l) => l.name === storedLanguage) ||
+      this.selectedLanguage;
+
     this.checkLaunchDialog();
   }
 
@@ -76,7 +100,11 @@ export class AppComponent {
   generate(option: string = ''): void {
     this.loading = true;
     this.aiService
-      .generateChapter(this.previousChapters, option)
+      .generateChapter(
+        this.previousChapters,
+        option,
+        this.selectedLanguage.name
+      )
       .subscribe({
         next: (res: any) => {
           if (res) {
@@ -97,7 +125,11 @@ export class AppComponent {
 
   generateNextOptionA() {
     this.aiService
-      .generateChapter(this.previousChapters, this.chapter?.optionA!)
+      .generateChapter(
+        this.previousChapters,
+        this.chapter?.optionA!,
+        this.selectedLanguage.name
+      )
       .subscribe({
         next: (res: any) => {
           if (res) {
@@ -116,7 +148,11 @@ export class AppComponent {
 
   generateNextOptionB() {
     this.aiService
-      .generateChapter(this.previousChapters, this.chapter?.optionB!)
+      .generateChapter(
+        this.previousChapters,
+        this.chapter?.optionB!,
+        this.selectedLanguage.name
+      )
       .subscribe({
         next: (res: any) => {
           if (res) {
@@ -134,6 +170,10 @@ export class AppComponent {
   }
 
   selectOption(option: number) {
+    if (!this.canSelectOption) {
+      return;
+    }
+
     if (option === 0) {
       this.chapter = this.nextOptionAChapter;
     } else {
@@ -173,6 +213,7 @@ export class AppComponent {
       return;
     }
 
+    this.audioContext = new AudioContext();
     await this.loadAudioBuffer(this.chapter.audio);
   }
 
@@ -186,10 +227,11 @@ export class AppComponent {
 
   togglePlayPause() {
     if (this.isPlaying) {
-      this.audioContext.suspend().then(() => {
-        this.isPlaying = false;
-        this.cdr.detectChanges();
-      });
+      return;
+      // this.audioContext.suspend().then(() => {
+      //   this.isPlaying = false;
+      //   this.cdr.detectChanges();
+      // });
     } else {
       if (this.audioContext.state === 'suspended') {
         this.audioContext.resume();
@@ -207,6 +249,7 @@ export class AppComponent {
     source.buffer = this.audioBuffer;
     source.connect(this.audioContext.destination);
     source.onended = () => {
+      this.hasPlayedAudio = true;
       this.isPlaying = false;
       this.cdr.detectChanges();
     };
@@ -219,5 +262,38 @@ export class AppComponent {
     audio.src = '../assets/pageturn.mp3';
     audio.load();
     audio.play();
+  }
+
+  get canSelectOption(): boolean {
+    return (
+      this.nextOptionAChapter !== undefined &&
+      this.nextOptionBChapter !== undefined &&
+      !this.isPlaying &&
+      !this.loading &&
+      this.hasPlayedAudio
+    );
+  }
+
+  openLanguageSelector(): void {
+    this.dialog
+      .open(LanguageSelectorComponent, {
+        data: {
+          selectedLanguage: this.selectedLanguage.name,
+        },
+        scrollStrategy: new NoopScrollStrategy(),
+        autoFocus: false,
+        width: '350px',
+        disableClose: true,
+        panelClass: 'custom-dialog',
+      })
+      .afterClosed()
+      .subscribe((language: Language) => {
+        this.selectedLanguage = language;
+        window.localStorage.setItem('language', language.name);
+      });
+  }
+
+  l18n(key: string): string {
+    return this.constants.strings[key]?.[this.selectedLanguage.name];
   }
 }

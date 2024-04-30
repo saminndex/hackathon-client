@@ -1,0 +1,10 @@
+.language-container {
+  border-radius: 20px;
+  padding: 10px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.language-container:hover {
+  background-color: rgb(226, 226, 226);
+}

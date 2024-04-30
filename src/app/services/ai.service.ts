@@ -7,10 +7,15 @@ export class AIService {
 
   PATH = 'ai';
 
-  generateChapter(previousChapters: string[], previousOption: string) {
+  generateChapter(
+    previousChapters: string[],
+    previousOption: string,
+    language: string
+  ) {
     return this.api.post(`${this.PATH}/generate`, {
       previousChapters,
       previousOption,
+      language,
     });
   }
 }

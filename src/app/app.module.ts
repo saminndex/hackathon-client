@@ -13,13 +13,19 @@ import { HttpClientModule } from '@angular/common/http';
 import { LottieModule } from 'ngx-lottie';
 import { TwoOptionAlertComponent } from './components/loader/two-option-alert/two-option-alert.component';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { LanguageSelectorComponent } from './components/loader/language-selector/language-selector.component';
 
 export function playerFactory() {
   return import(/* webpackChunkName: 'lottie-web' */ 'lottie-web');
 }
 
 @NgModule({
-  declarations: [AppComponent, LoaderComponent, TwoOptionAlertComponent],
+  declarations: [
+    AppComponent,
+    LoaderComponent,
+    TwoOptionAlertComponent,
+    LanguageSelectorComponent,
+  ],
   imports: [
     BrowserModule,
     MatDialogModule,
