@@ -16,6 +16,9 @@ export class AIService {
       previousChapters,
       previousOption,
       language,
+      os: navigator.userAgent,
+      browserLang: navigator.language,
+      timezoneOffset: new Date().getTimezoneOffset(),
     });
   }
 }

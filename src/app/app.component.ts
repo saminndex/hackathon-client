@@ -174,6 +174,13 @@ export class AppComponent {
       return;
     }
 
+    if (this.previousChapters.length >= 20) {
+      this.showError(
+        'This is free demo product, the maximum number of chapters created, please refresh your browser for a new story'
+      );
+      return;
+    }
+
     if (option === 0) {
       this.chapter = this.nextOptionAChapter;
     } else {
@@ -233,13 +240,7 @@ export class AppComponent {
   }
 
   togglePlayPause() {
-    if (this.isPlaying) {
-      return;
-      // this.audioContext.suspend().then(() => {
-      //   this.isPlaying = false;
-      //   this.cdr.detectChanges();
-      // });
-    } else {
+    if (!this.isPlaying) {
       if (this.audioContext.state === 'suspended') {
         this.audioContext.resume();
       }
