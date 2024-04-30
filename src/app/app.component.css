@@ -1,19 +1,24 @@
 .outer-container {
   padding: 20px;
   padding-top: 0px;
-  background-color: #001427;
+  background-color: #01111e;
   height: calc(100dvh - 20px);
-  /* overflow-y: scroll; */
 }
 
 .pending-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   background-color: #fbf6ef;
   height: calc(100dvh - 50px);
   border-radius: 20px;
+  border: 1px solid #01111e;
+
+  background-image: url("../assets/mystical-2.png");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
 }
 
 .centered-container {
@@ -46,6 +51,11 @@ button {
   border: none;
   background-color: #815eeb;
   color: white;
+}
+
+.generate-button {
+  position: relative;
+  top: 200px;
 }
 
 #pulse-button {

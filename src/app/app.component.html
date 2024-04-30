@@ -27,6 +27,7 @@
 
   <div class="pending-container" *ngIf="!chapter">
     <button
+      class="generate-button"
       (click)="generate()"
       [disabled]="loading"
       *ngIf="!chapter && !loading"
@@ -41,7 +42,11 @@
       >{{ l18n("generateStory") }}
     </button>
 
-    <loader *ngIf="loading" [language]="selectedLanguage"></loader>
+    <loader
+      *ngIf="loading"
+      [language]="selectedLanguage"
+      style="position: relative; top: 200px"
+    ></loader>
   </div>
 
   <div class="centered-container" *ngIf="chapter">
