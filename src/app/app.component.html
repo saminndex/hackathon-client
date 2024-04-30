@@ -59,7 +59,10 @@
         [options]="options"
         *ngIf="isPlaying"
       ></ng-lottie>
-      <img class="story-image" *ngIf="image" [src]="image" />
+
+      <div style="width: 180px; height: 180px">
+        <img class="story-image" *ngIf="image" [src]="image" />
+      </div>
 
       <button
         class="play-button"
