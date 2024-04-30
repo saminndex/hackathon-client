@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -34,7 +33,6 @@ export function playerFactory() {
     MatDialogModule,
     CommonModule,
     HttpClientModule,
-    AppRoutingModule,
     BrowserAnimationsModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
