@@ -10,44 +10,41 @@ import { NoopScrollStrategy } from '@angular/cdk/overlay';
 import { Language } from './models/language';
 import { Constants } from './app.constants';
 import { LanguageSelectorComponent } from './components/language-selector/language-selector.component';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  animations: [
+    trigger('fadeInOut', [
+      state('in', style({ opacity: 1 })),
+      state('out', style({ opacity: 0 })),
+      transition('out => in', animate('600ms ease-in')),
+      transition('in => out', animate('600ms ease-out')),
+    ]),
+  ],
 })
 export class AppComponent {
-  title?: string;
+  [key: string]: any;
 
+  title?: string;
   currentChapter = 0;
   previousChapters: any[] = [];
-
   nextOptionAChapter?: Chapter;
   nextOptionBChapter?: Chapter;
-
   options: AnimationOptions = { path: '/assets/waves.json', loop: true };
-
   image?: string;
-
-  // image?: string =
-  //   'https://plus.unsplash.com/premium_photo-1711508491462-5567bb2f1e33?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-
-  private audioContext!: AudioContext;
-  private audioBuffer?: AudioBuffer;
-
+  audioContext!: AudioContext;
+  audioBuffer?: AudioBuffer;
   loading = false;
-
   chapter?: Chapter;
-  // chapter?: Chapter = {
-  //   title: 'Title',
-  //   content:
-  //     'The wind whipped your hair as you stood at the precipice of the ancient stone bridge. Below, a raging torrent churned, threatening to pull you into its depths with each crashing wave. Your heart hammered against your ribs, keeping time with the rhythm of the treacherous current. Before you, a weathered signpost stood sentinel, its weathered wood splintering at the edges. Two arrows pointed in opposite directions, each carved with an inscription worn smooth by time and countless hands.',
-  //   optionA:
-  //     'Follow the arrow that points towards the towering mountain shrouded in mist, its peak hidden from view.',
-  //   optionB:
-  //     'Turn and follow the arrow that leads into the whispering woods, shadows dancing among the ancient trees.',
-  // };
-
   isPlaying = false;
   selectedLanguage: Language = this.constants.languages[1];
   hasPlayedAudio = false;
@@ -61,13 +58,16 @@ export class AppComponent {
   ) {}
 
   ngOnInit(): void {
+    this.initLanguage();
+    this.checkLaunchDialog();
+  }
+
+  initLanguage(): void {
     const storedLanguage = window.localStorage.getItem('language');
 
     this.selectedLanguage =
       this.constants.languages.find((l) => l.name === storedLanguage) ||
       this.selectedLanguage;
-
-    this.checkLaunchDialog();
   }
 
   checkLaunchDialog() {
@@ -99,6 +99,7 @@ export class AppComponent {
 
   generate(option: string = '') {
     this.loading = true;
+
     this.aiService
       .generateChapter(
         this.previousChapters,
@@ -121,52 +122,6 @@ export class AppComponent {
         },
       })
       .add(() => (this.loading = false));
-  }
-
-  generateNextOptionA() {
-    this.aiService
-      .generateChapter(
-        this.previousChapters,
-        this.chapter?.optionA!,
-        this.selectedLanguage.name
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res) {
-            this.nextOptionAChapter = res.data;
-
-            this.nextOptionAChapter!.audio = new Uint8Array(
-              res.data.audio.data
-            ).buffer;
-          }
-        },
-        error: (res: HttpErrorResponse) => {
-          this.showError(res.error.message);
-        },
-      });
-  }
-
-  generateNextOptionB() {
-    this.aiService
-      .generateChapter(
-        this.previousChapters,
-        this.chapter?.optionB!,
-        this.selectedLanguage.name
-      )
-      .subscribe({
-        next: (res: any) => {
-          if (res) {
-            this.nextOptionBChapter = res.data;
-
-            this.nextOptionBChapter!.audio = new Uint8Array(
-              res.data.audio.data
-            ).buffer;
-          }
-        },
-        error: (res: HttpErrorResponse) => {
-          this.showError(res.error.message);
-        },
-      });
   }
 
   selectOption(option: number) {
@@ -197,22 +152,40 @@ export class AppComponent {
 
   async refresh(autoPlay: boolean = false) {
     this.currentChapter++;
-
     this.cdr.detectChanges();
-
     this.previousChapters.push({
       [`chapter${this.currentChapter}`]: this.chapter!.content,
     });
 
     const setupComplete = await this.setupAudio();
-
     if (setupComplete && autoPlay) {
       this.hasPlayedAudio = false;
       this.togglePlayPause();
     }
 
-    this.generateNextOptionA();
-    this.generateNextOptionB();
+    this.generateOption(this.chapter?.optionA, 'A');
+    this.generateOption(this.chapter?.optionB, 'B');
+  }
+
+  generateOption(option: string | undefined, optionLabel: 'A' | 'B') {
+    if (!option) return;
+
+    this.aiService
+      .generateChapter(
+        this.previousChapters,
+        option,
+        this.selectedLanguage.name
+      )
+      .subscribe({
+        next: (res: any) => {
+          const targetChapter = `nextOption${optionLabel}Chapter`;
+          this[targetChapter] = res.data;
+          this[targetChapter]!.audio = new Uint8Array(
+            res.data.audio.data
+          ).buffer;
+        },
+        error: (res: HttpErrorResponse) => this.showError(res.error.message),
+      });
   }
 
   showError(message: string): void {
