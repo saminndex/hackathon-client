@@ -20,7 +20,7 @@ export class Constants {
     { name: 'Arabic', emoji: '🇸🇦' },
     { name: 'English', emoji: '🇬🇧' },
     { name: 'French', emoji: '🇫🇷' },
-    { name: 'german', emoji: '🇩🇪' },
+    { name: 'German', emoji: '🇩🇪' },
     { name: 'Hindi', emoji: '🇮🇳' },
     { name: 'Indonesian', emoji: '🇮🇩' },
     { name: 'Italian', emoji: '🇮🇹' },
