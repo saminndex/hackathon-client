@@ -1,0 +1,46 @@
+<div class="dialog-container">
+  <div
+    mat-dialog-title
+    style="display: flex; justify-content: space-between; align-items: center"
+  >
+    <p
+      class="section-title"
+      style="margin-bottom: 0px; font-weight: bold; font-size: 16px"
+    >
+      Select Genre
+    </p>
+    <button (click)="matDialogRef.close()">
+      <mat-icon class="db-icon" style="color: grey">close</mat-icon>
+    </button>
+  </div>
+
+  <div class="language-content">
+    <div
+      class="language-container"
+      *ngFor="let genre of constants.genres"
+      (click)="genreSelected(genre.name)"
+      [style.background-color]="
+        genre.name === data.selectedGenre ? 'whitesmoke' : 'white'
+      "
+    >
+      <div>
+        <span style="font-size: 18px">{{ genre.emoji }}</span
+        ><span
+          style="margin-left: 10px"
+          [style.font-weight]="
+            genre.name === data.selectedGenre ? 'bold' : 'normal'
+          "
+          >{{ l18n(genre.name) }}</span
+        >
+      </div>
+    </div>
+  </div>
+
+  <mat-dialog-actions
+    ><p
+      class="section-title"
+      style="margin-bottom: 0px; font-size: 12px; color: gray"
+    >
+      Want a new genre added?? Contact sam.adda2@gmail.com<br /></p
+  ></mat-dialog-actions>
+</div>

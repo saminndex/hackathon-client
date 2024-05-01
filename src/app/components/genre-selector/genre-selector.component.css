@@ -1,0 +1,37 @@
+.language-content {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.language-container {
+  border-radius: 20px;
+  padding: 10px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.language-container:hover {
+  background-color: whitesmoke !important;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  padding: 7px;
+}
+
+button:hover {
+  background-color: whitesmoke;
+}
+
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  z-index: 9999999;
+}

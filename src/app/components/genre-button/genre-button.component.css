@@ -1,0 +1,37 @@
+.genre-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  border-radius: 20px;
+  background-color: #f4eadc;
+  padding: 10px;
+  margin-bottom: 40px;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 180px;
+}
+
+.genre-button:hover {
+  background-color: whitesmoke;
+}
+
+.genre-label {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.genre-icon {
+  padding-right: 5px;
+}
+
+.genre-emoji {
+  padding-left: 5px;
+}
+
+mat-icon {
+  color: black;
+  vertical-align: middle;
+  width: 20px;
+}

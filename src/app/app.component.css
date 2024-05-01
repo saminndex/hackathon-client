@@ -53,6 +53,12 @@ button {
   color: white;
 }
 
+.genre-button {
+  position: relative;
+  top: 50px;
+  z-index: 999;
+}
+
 .generate-button {
   position: relative;
   top: 200px;

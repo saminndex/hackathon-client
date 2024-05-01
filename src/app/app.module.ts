@@ -16,6 +16,8 @@ import { LanguageSelectorComponent } from './components/language-selector/langua
 
 import { ApiService } from './services/api.service';
 import { LottieModule } from 'ngx-lottie';
+import { GenreButtonComponent } from './components/genre-button/genre-button.component';
+import { GenreSelectorComponent } from './components/genre-selector/genre-selector.component';
 
 export function playerFactory() {
   return import(/* webpackChunkName: 'lottie-web' */ 'lottie-web');
@@ -27,6 +29,8 @@ export function playerFactory() {
     LoaderComponent,
     TwoOptionAlertComponent,
     LanguageSelectorComponent,
+    GenreButtonComponent,
+    GenreSelectorComponent,
   ],
   imports: [
     BrowserModule,

@@ -10,12 +10,14 @@ export class AIService {
   generateChapter(
     previousChapters: string[],
     previousOption: string,
-    language: string
+    language: string,
+    genre: string
   ) {
     return this.api.post(`${this.PATH}/generate`, {
       previousChapters,
       previousOption,
       language,
+      genre,
       os: navigator.userAgent,
       browserLang: navigator.language,
       timezoneOffset: new Date().getTimezoneOffset(),

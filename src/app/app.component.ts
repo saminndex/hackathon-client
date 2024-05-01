@@ -47,6 +47,7 @@ export class AppComponent {
   chapter?: Chapter;
   isPlaying = false;
   selectedLanguage: Language = this.constants.languages[1];
+  selectedGenre: string = 'fantasy';
   hasPlayedAudio = false;
 
   constructor(
@@ -59,6 +60,7 @@ export class AppComponent {
 
   ngOnInit(): void {
     this.initLanguage();
+    this.initGenre();
     this.checkLaunchDialog();
   }
 
@@ -68,6 +70,18 @@ export class AppComponent {
     this.selectedLanguage =
       this.constants.languages.find((l) => l.name === storedLanguage) ||
       this.selectedLanguage;
+  }
+
+  initGenre(): void {
+    this.selectedGenre = window.localStorage.getItem('genre') || 'fantasy';
+  }
+
+  get selectedGenreProper(): string {
+    const localGenre = window.localStorage.getItem('genre') || 'fantasy';
+
+    return this.constants.strings[localGenre]?.[
+      this.selectedLanguage?.name || 'English'
+    ];
   }
 
   checkLaunchDialog() {
@@ -104,7 +118,8 @@ export class AppComponent {
       .generateChapter(
         this.previousChapters,
         option,
-        this.selectedLanguage.name
+        this.selectedLanguage.name,
+        this.selectedGenreProper
       )
       .subscribe({
         next: async (res: any) => {
@@ -174,7 +189,8 @@ export class AppComponent {
       .generateChapter(
         this.previousChapters,
         option,
-        this.selectedLanguage.name
+        this.selectedLanguage.name,
+        this.selectedGenreProper
       )
       .subscribe({
         next: (res: any) => {

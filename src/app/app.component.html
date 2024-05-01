@@ -26,6 +26,13 @@
   </div>
 
   <div class="pending-container" *ngIf="!chapter">
+    <genre-button
+      class="genre-button"
+      [language]="selectedLanguage"
+      [genre]="selectedGenre"
+      [loading]="loading"
+    ></genre-button>
+
     <button
       class="generate-button"
       (click)="generate()"
