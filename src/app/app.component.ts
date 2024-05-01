@@ -78,10 +78,7 @@ export class AppComponent {
 
   get selectedGenreProper(): string {
     const localGenre = window.localStorage.getItem('genre') || 'fantasy';
-
-    return this.constants.strings[localGenre]?.[
-      this.selectedLanguage?.name || 'English'
-    ];
+    return this.constants.strings[localGenre]?.['English'];
   }
 
   checkLaunchDialog() {
